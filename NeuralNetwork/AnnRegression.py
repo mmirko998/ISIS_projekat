@@ -1,10 +1,10 @@
 from keras.layers import Dense
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 import numpy as np
 from tensorflow import keras
 from AnnBase import AnnBase
 
-MODEL_NAME = 'model_v0.5'
+MODEL_NAME = 'models/model_v0.5'
 
 
 class AnnRegression(AnnBase):
@@ -21,7 +21,7 @@ class AnnRegression(AnnBase):
         return model
     
     def GetModelFromPath(self, path):
-        model = keras.models.load_model(path)
+        model = load_model(path)
         return model
     
     def CompileAndFit(self, trainX, trainY):
@@ -40,9 +40,9 @@ class AnnRegression(AnnBase):
         return trainPredict, testPredict
     
     def CompileFitPredict(self, trainX, trainY, testX):
-        self.compile_and_fit(trainX, trainY)
-        return self.get_predict(testX)
+        self.CompileAndFit(trainX, trainY)
+        return self.GetPredict(testX)
 
     def Predict(self, path, testX):     
-        self.use_current_model(path)
-        return self.get_predict2(testX)
+        self.UseCurrentModel(path)
+        return self.GetPredict(testX)
