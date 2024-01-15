@@ -1,0 +1,45 @@
+import numpy
+from sklearn.preprocessing import MinMaxScaler
+
+
+class DataPreparer:
+        def __init__(self, dataFrame, numberOfColumns, share_for_training):
+            self.scaler = MinMaxScaler(feature_range=(0, 1))
+            self.datasetOrig = dataFrame.values
+            self.datasetOrig = self.datasetOrig.astype('float32')
+            self.numberOfColumns = numberOfColumns
+            self.predictorColumnNo = self.numberOfColumns - 1
+            self.shareForTraining = share_for_training
+            
+        def PrepareDataForTraining(self):
+            dataset = self.scaler.fit_transform(self.datasetOrig)
+            trainSize = int(len(dataset) * self.shareForTraining)
+            testSize = len(dataset) - trainSize
+            train, test = dataset[0:trainSize,:], dataset[trainSize:len(dataset),:]
+            print(len(train), len(test))        
+            lookBack = self.numberOfColumns
+            trainX, trainY = self.creatDataset(train, lookBack)
+            testX, testY = self.creatDataset(test, lookBack)
+            trainX = numpy.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
+            testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
+            self.trainX = trainX
+            self.trainY = trainY
+            self.testX = testX
+            self.testY = testY
+            return trainX.copy(), trainY.copy(), testX.copy(), testY.copy()
+        
+        def CreateDataset(self, dataset, lookBack):
+            dataX, dataY = [], []
+            for i in range(len(dataset)-1):
+                a = dataset[i, 0:lookBack-1]
+                dataX.append(a)
+                dataY.append(dataset[i, lookBack-1])
+            return numpy.array(dataX), numpy.array(dataY)
+        
+        def createTestDataset(self, dataset, lookBack):
+            dataX, dataY = [], []
+            for i in range(len(dataset)):
+                a = dataset[i, 0:lookBack-1]
+                dataX.append(a)
+                dataY.append(dataset[i, lookBack-1])
+            return numpy.array(dataX), numpy.array(dataY)
